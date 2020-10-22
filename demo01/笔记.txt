@@ -1,0 +1,11 @@
+Express 简单介绍
+Express 是一个基于 node.js 平台，快速、开放、极简的 web 开发框架，它提供一系列强大的特性，帮助你创建各种 web 和移动设备。
+
+cnpm install express --save
+
+get请求：获取数据
+post请求：添加数据
+put请求：修改数据
+delete请求：删除数据
+
+配置路由也要注意顺序
