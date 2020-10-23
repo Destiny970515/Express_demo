@@ -1,0 +1,76 @@
+Express 中使用 Session
+
+1、Session 简单介绍
+  session 是另一种记录客户状态的机制，
+不同的是 Cookie 保存在客户端浏览器中，
+而session 保存在服务器上。
+
+  cookie 数据存放在客户的浏览器上，session 数据存放在服务器上。
+session 相比 cookie 要更安全一些。由于 session 保存到服务器上，所以当访问量增多的时候，
+会比较占用服务器的性能。单个 cookie 保存的数据大小不能超过 4k ，
+很多浏览器都限制一个站点最多保存20个 cookie。
+session 没有这方面的限制。session 是基于 cookie 进行工作的。
+
+2、Session 的工作流程
+  当浏览器访问服务器并发送第一次请求时，服务器端会创建一个 session 对象，生成一个
+类似于 key，value 的键值对，然后将 key（cookie） 返回到浏览器（客户）端，浏览器下次
+再访问时，携带 key（cookie），找到对应的 session（value）
+
+3、Session 的使用
+
+3-1、安装 express-session
+cnpm i express-session --save
+
+3-2、引入 session
+const session = require("express-session");
+
+3-3、配置 session 中间件
+app.use(session({
+  secret: "this is session",    // 用于生成 session 服务器端的签名
+  resave: false,                   // 强制保存 session 即使它并没有变化
+  saveUninitialized: true,    // 强制将未初始化的 session 存储
+  name: "Destiny",             // 修改 session 对应 cookie 的名称
+  cookie: {                         // 配置 cookie
+    maxAge: 1000*60*60,          // 设置 cookie 过期时间
+    secure: false                 // true 表示只有 https 协议才能访问 cookie
+  },
+  rolling: true                    // 在每次请求时强行设置 cookie, 这将重置 cookie 过期时间（默认：false）
+}));
+
+3-4、使用
+获取：req.session.username
+设置：req.session.username = "张三"
+
+
+4、express-session 的常用方法
+// 1、设置 session 的过期时间为 0 （不建议使用，如果存在多个 session 的时候，会把所有 session 都销毁）
+  // req.session.cookie.maxAge = 0;
+  
+  // 2、销毁指定 session (常用)
+  // req.session.username = ""
+
+  // 3、销毁所有 session destroy
+  req.session.destroy((err) => {
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
