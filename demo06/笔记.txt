@@ -1,0 +1,26 @@
+Express  多服务器负载均衡 session 保存到数据库
+
+1、需要安装 express-session 和 connect-mongo 模块
+cnpm i express-session --save
+cnpm i connect-mongo --save
+
+2、引入模块
+const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
+
+3、配置中间件
+app.use(session({
+  secret: "this is session",            // 用于生成 session 服务器端的签名
+  resave: false,                           // 强制保存 session 即使它并没有变化
+  saveUninitialized: true,            // 强制将未初始化的 session 存储
+  name: "Destiny",                     // 修改 session 对应 cookie 的名称
+  cookie: {                                 // 配置 cookie
+    maxAge: 1000*60*60,            // 设置 cookie 过期时间
+    secure: false                         // true 表示只有 https 协议才能访问 cookie
+  },
+  rolling: true,                           // 在每次请求时强行设置 cookie, 这将重置 cookie 过期时间（默认：false）
+  store: new MongoStore({       // 配置连接数据库
+    url: "mongodb://127.0.0.1:27017/shop",
+    touchAfter: 24 * 3600          // 不管发出多了多少请求 在24小时内只更新一次 session 除非你改变了这个 session
+  }),
+}));
