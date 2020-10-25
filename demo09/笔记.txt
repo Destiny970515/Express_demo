@@ -1,0 +1,78 @@
+Express 结合 multer 上传文件 按照日期生成存储目录 及 多文件上传
+
+1、按照日期生成存储目录 (demo: nav)
+使用 silly-datetime（日期格式化） 中间件 以及 mkdirp（创建目录）中间件
+
+安装中间件
+cnpm i silly-datetime --save
+cnpm i mkdirp --save
+
+引入中间件
+const sd = require('silly-datetime');
+const mkdirp = require('mkdirp');
+
+使用
+const storage = multer.diskStorage({
+      destination: async (req, file, cb) => {
+        // 1、获取当前日期
+        let day = sd.format(new Date(), 'YYYYMMDD')
+        let dir = path.join("static/upload", day);
+        console.log(dir);
+        // 2、按照日期生成图片存储目录 mkdirp是一个异步方法
+        await mkdirp(dir)
+        // 3、设置上传文件目录
+        cb(null, dir)
+      },
+      filename: (req, file, cb) => {
+        // 获取后缀名
+        let extname = path.extname(file.originalname);
+        // console.log(extname);
+        cb(null, file.fieldname + '-' + Date.now() + extname);
+      }
+})
+const upload = multer({ storage: storage });
+
+注意：由于 mkdirp 中间件返回的是一个 Promise （异步回调）所以要 使用 asyns await 改为同步。
+
+2、多文件上传（demo: user)
+
+单个图片使用 multer().single()
+多个图片使用 multer().fields()
+
+配置多个图片参数：
+const cpUpload = tools.multer().fields([
+  {
+    name: "pic1", 
+    maxCount: 1 // 最大数量
+  },
+  {
+    name: "pic2",
+    maxCount: 1  // 最大数量
+  }
+]);
+
+使用：
+router.post("/doAdd", cpUpload, (req, res) => {
+  // 获取表单数据
+  res.send({
+    body: req.body,
+    files: req.files
+  });
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+Express 结合 Multer 上传图片
+
+Multer 模块介绍
+    Multer 是一个 node.js 中间件，用于处理 multipart/form-data 类型的表单数据。
+他主要用于上传文件。它是写在 busboy 之上非常高效。
+
+注意：Multer 不会处理任何非 multipart/form-data 类型的表单数据
+
+Multer 模块使用
+1、安装 Multer：
+cnpm install multer --save
+
+2、引入配置 multer 模块
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, "static/upload") // 上传文件目录
+      },
+      filename: (req, file, cb) => {
+        // 获取后缀名
+        let extname = path.extname(file.originalname);
+        // console.log(extname);
+        cb(null, file.fieldname + '-' + Date.now() + extname);
+      }
+})
+const upload = multer({ storage: storage });
+
+3、使用 multer 上传文件
+router.post("/doAdd",upload.single("pic") ,(req, res) => {
+  // 获取表单数据
+  // let body = req.body;
+  res.send({
+    body: req.body,
+    file: req.file
+  });
+})
